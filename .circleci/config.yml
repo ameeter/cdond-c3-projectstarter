@@ -165,7 +165,7 @@ jobs:
           command: |
             # Your code here
             echo "[all]" > inventory.txt
-            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory
+            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
 
             #exit 1
       - persist_to_workspace:
