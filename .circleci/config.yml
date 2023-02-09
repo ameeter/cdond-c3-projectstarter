@@ -191,7 +191,7 @@ jobs:
           command: |
             # Your code here
             apk add --update ansible
-            yum install -y tar gzip
+            #yum install -y tar gzip
            # exit 1
       - run:
           name: Configure server
