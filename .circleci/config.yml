@@ -228,7 +228,7 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli      # Docker image here that supports AWS CLI
+      - image: ntr9h/node-awscli2 #amazon/aws-cli      # Docker image here that supports AWS CLI
     steps:
       # Checkout code from git
       - checkout
@@ -237,7 +237,7 @@ jobs:
           command: |
             # your code here
             yum -y install tar and gzip
-            yum -y install nodejs  
+            #yum -y install nodejs  
       - run:
           name: Get backend url
           command: |
