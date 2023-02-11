@@ -267,6 +267,43 @@ jobs:
       - revert-migrations
       - destroy-environment 
 
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11 # Docker image here that supports Ansible
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["3a:44:ff:ad:19:7e:a4:61:1e:33:09:4e:48:a3:00:6b"] 
+      # attach workspace
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-build]    
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            apk add --update ansible
+            #yum install -y tar gzip
+           # exit 1
+      - run:
+          name: Deploy backend
+          command: |
+            # Your code here
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      # Here's where you will add some code to rollback on failure 
+      - revert-migrations
+      - destroy-environment 
+
 workflows:
   default:
     jobs:
@@ -284,8 +321,8 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
-      #- deploy-backend:
-      #    requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       #- smoke-test:
       #    requires: [deploy-backend, deploy-frontend]
       #- cloudfront-update:
