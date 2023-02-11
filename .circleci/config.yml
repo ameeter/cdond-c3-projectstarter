@@ -7,6 +7,11 @@ commands:
       # Add parameter here   
     steps:
       - run:
+          name: Delete S3 content
+          when: on_fail
+          command: |
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - run:
           name: Destroy environments
           when: on_fail
           command: |
@@ -23,15 +28,18 @@ commands:
       - run:
           name: Revert migrations
           # Add when this will run
+          when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS = 'curl https://kvdb.io/7iKzLiSyAUUM15XfoKBFeh/migration_${CIRCLE_WORKFLOW_ID:0:7}'
+            echo $SUCCESS
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+              cd ~/project/backend
+              npm install
+              #Add revert code here. You can find this in the Getting Started section.
+              npm run migrations:revert
+              #exit 1
             fi
             
 jobs:
@@ -228,7 +236,7 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: circleci/node:14.15.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
@@ -255,7 +263,9 @@ jobs:
             npm run build || exit 1
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive || exit 1
-
+      # Here's where you will add some code to rollback on failure
+      - revert-migrations
+      - destroy-environment 
 
 workflows:
   default:
@@ -274,4 +284,12 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
+      #- deploy-backend:
+      #    requires: [run-migrations]
+      #- smoke-test:
+      #    requires: [deploy-backend, deploy-frontend]
+      #- cloudfront-update:
+      #    requires: [smoke-test]
+      #- cleanup:
+      #    requires: [cloudfront-update]
 
