@@ -23,15 +23,19 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      # Add parameter here     
+      # Add parameter here 
+        
     steps:
+      - restore_cache:
+          key: backend-build
+
       - run:
           name: Revert migrations
           # Add when this will run
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 'curl https://kvdb.io/7iKzLiSyAUUM15XfoKBFeh/migration_${CIRCLE_WORKFLOW_ID:0:7}'
+            SUCCESS='curl https://kvdb.io/7iKzLiSyAUUM15XfoKBFeh/migration_${CIRCLE_WORKFLOW_ID:0:7}'
             echo $SUCCESS
             if(( $SUCCESS==1 )); 
             then
@@ -239,6 +243,8 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -277,13 +283,16 @@ jobs:
       # attach workspace
       - attach_workspace:
           at: ~/
+      - attach_workspace:
+          at: /tmp/workspace
       - restore_cache:
           keys: [backend-build]    
       - run:
           name: Install dependencies
           command: |
             # Your code here
-            apk add --update ansible
+            apk add --update ansible tar gzip nodejs npm openssh-client
+            pip install awscli
             #yum install -y tar gzip
            # exit 1
       - run:
