@@ -228,22 +228,19 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image:  circleci/node:13.8.0 #ntr9h/node-awscli2#amazon/aws-cli      # Docker image here that supports AWS CLI
+      - image: circleci/node:14.15.0
     steps:
-      # Checkout code from git
       - checkout
       - run:
-          name: Install dependencies #Python, Ansible, Node, NPM
+          name: Install dependencies
           command: |
-            # your code here
-            # yum -y install tar and gzip
-            # yum -y install nodejs  
-            apt upgrade -y;apt update;apt install python3 python3-pip python3-setuptools -y; python3 -m pip --no-cache-dir install --upgrade awscli
-
+            apt upgrade -y
+            apt update
+            apt install python3 python3-pip python3-setuptools -y
+            python3 -m pip install awscli
       - run:
           name: Get backend url
           command: |
-            # your code here
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
@@ -252,13 +249,12 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
             cd frontend
-            npm install
-            npm run build
+            npm install || exit 1
+            npm run build || exit 1
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure 
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive || exit 1
+
 
 workflows:
   default:
