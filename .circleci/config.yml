@@ -267,6 +267,8 @@ jobs:
             sudo ./aws/install
       - run:
           name: Run migrations
+          no_output_timeout: 20m
+          working_directory: ./backend
           command: |
             # Your code here
             cd backend
