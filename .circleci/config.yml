@@ -332,7 +332,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.10.4 #python:3.7-alpine3.11 # Docker image here that supports Ansible
+      - image: circleci/node:13.8.0 #python:3.10.4 #python:3.7-alpine3.11 # Docker image here that supports Ansible
     steps:
       - checkout
       - add_ssh_keys:
@@ -350,9 +350,14 @@ jobs:
             # Your code here
             #apk add --update ansible tar gzip nodejs npm openssh-client
             #pip install awscli
-            pip install pip --upgrade
-            pip install ansible awscli
+            #pip install pip --upgrade
+            #pip install ansible awscli
             #yum install -y tar gzip
+            sudo apt-get update
+            sudo apt upgrade -y
+            sudo apt update
+            sudo apt install python3 python3-pip python3-setuptools -y
+            python3 -m pip install ansible awscli
            # exit 1
       - run:
           name: Deploy backend
