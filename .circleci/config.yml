@@ -387,9 +387,11 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
+            apt update
+            apt install -y curl nodejs npm
             pip install pip --upgrade
             pip install awscli
-            apk add --update curl nodejs npm
+            #apk add --update curl nodejs npm
       - run:
           name: Get backend url
           command: |
