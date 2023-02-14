@@ -269,7 +269,7 @@ jobs:
           no_output_timeout: 20m
           command: |
             # Your code here
-            cd backend
+            cd backend/src/migrations
             pwd
             ls -al
             npm install
