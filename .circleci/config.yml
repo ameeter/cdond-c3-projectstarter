@@ -502,7 +502,7 @@ jobs:
               #  echo "--------------Cleanup Success----------------"
               #fi
 
-              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
+              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" && "${OldWorkflowID}" !=""  ]] 
               then
                 echo "=========Begin Cleanup==========="
                 aws s3 rm s3://udapeople-${OldWorkflowID} --recursive --quiet
