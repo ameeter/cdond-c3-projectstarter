@@ -486,17 +486,16 @@ jobs:
               export OldWorkflowID=$(curl https://kvdb.io/N7cmQg1DwZbADh2Hu3NncF/OldWorkflowID)
               echo "s3://udapeople-${OldWorkflowID}"
               aws s3 ls
-              if aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep -q 'bucket not found'
+              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
               then
-                aws s3 ls
-                echo "Bucket not found"
-                echo "=========Cannot Cleanup=========="
-              else
                 echo "=========Begin Cleanup==========="
                 aws s3 rm s3://udapeople-${OldWorkflowID} --recursive --quiet
                 aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
                 echo "========Cleanup Success=========="
+              else
+                aws s3 ls
+                echo "=========Cannot Cleanup=========="
               fi
         - revert-migrations
 
