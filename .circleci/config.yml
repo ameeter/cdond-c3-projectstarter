@@ -189,7 +189,7 @@ jobs:
             # Your code here
             echo "[web]" > ~/inventory.txt
             aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
-            echo ~/inventory.txt
+            cat ~/inventory.txt
             #exit 1
       - persist_to_workspace:
           root: ~/
