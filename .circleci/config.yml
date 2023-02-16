@@ -485,7 +485,8 @@ jobs:
               echo "s3://udapeople-${OldWorkflowID}"
               aws s3 ls
 
-              #if [[ aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep -q "The specified bucket does not exist" && "${OldWorkflowID}" != "" ]]
+              aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep "The specified bucket does not exist"
+              
               if [[ $(aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep -q "The specified bucket does not exist" && "${OldWorkflowID}" != "") ]]
               then
                 aws s3 ls
