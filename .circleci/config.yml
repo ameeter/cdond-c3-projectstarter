@@ -499,6 +499,8 @@ jobs:
               #  echo "Frontend-Stack :"" "udapeople-frontend-${OldWorkflowID}"
               #  echo "--------------Cleanup Success----------------"
               #fi
+              echo "Old work flow: ${OldWorkflowID}"
+              echo "current work flow: ${CIRCLE_WORKFLOW_ID:0:7}"
               aws s3api list-buckets --query 'Buckets[].Name' --output text
               aws s3api list-buckets --query 'Buckets[].Name' --output text | grep -E '^[a-zA-Z0-9.\-_]{1,255}$' | while read bucket; do aws s3api get-bucket-tagging --bucket "$bucket" --query 'TagSet[?Key==`aws:cloudformation:logical-id` && Value==`WebsiteBucket`]' --output text | grep -q aws:cloudformation:logical-id && echo "$bucket"; done | wc -l
 
