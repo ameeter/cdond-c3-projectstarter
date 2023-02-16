@@ -499,6 +499,8 @@ jobs:
               #  echo "Frontend-Stack :"" "udapeople-frontend-${OldWorkflowID}"
               #  echo "--------------Cleanup Success----------------"
               #fi
+              aws s3api list-buckets --query 'Buckets[].Name' --output text
+              aws s3api list-buckets --query 'Buckets[].Name' --output text | grep -E '^[a-zA-Z0-9.\-_]{1,255}$' | while read bucket; do aws s3api get-bucket-tagging --bucket "$bucket" --query 'TagSet[?Key==`aws:cloudformation:logical-id` && Value==`WebsiteBucket`]' --output text | grep -q aws:cloudformation:logical-id && echo "$bucket"; done | wc -l
 
               if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" && "${OldWorkflowID}" != "" ]]
               then
@@ -523,26 +525,26 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend]#, scan-frontend, scan-backend]..
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      #- build-frontend
+      #- build-backend
+      #- test-frontend:
+      #    requires: [build-frontend]
+      #- test-backend:
+      #    requires: [build-backend]
+      #- deploy-infrastructure:
+      #    requires: [test-frontend, test-backend]#, scan-frontend, scan-backend]..
+      #- configure-infrastructure:
+      #    requires: [deploy-infrastructure]
       #- run-migrations:
       #    requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [configure-infrastructure]#[run-migrations]
-      - deploy-backend:
-          requires: [configure-infrastructure]#[run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      #- deploy-frontend:
+      #    requires: [configure-infrastructure]#[run-migrations]
+      #- deploy-backend:
+      #    requires: [configure-infrastructure]#[run-migrations]
+      #- smoke-test:
+      #    requires: [deploy-backend, deploy-frontend]
+      #- cloudfront-update:
+      #    requires: [smoke-test]
+      - cleanup
+      #    requires: [cloudfront-update]
 
