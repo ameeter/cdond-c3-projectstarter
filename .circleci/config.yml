@@ -10,7 +10,7 @@ commands:
           name: Delete S3 files
           when: on_fail
           command: |
-            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive --debug
       - run:
           name: Destroy environments
           when: on_fail
@@ -488,7 +488,6 @@ jobs:
               #aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep "bucket does not exist"
 
               if [[ $(aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep -q "The specified bucket does not exist" && "${OldWorkflowID}" != "") ]]
-              #if [[ $(aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep -q "The specified bucket does not exist") && ! -z "${OldWorkflowID}" ]]
               then
                 aws s3 ls
                 echo "Bucket not found"
@@ -530,26 +529,26 @@ jobs:
 workflows:
   default:
     jobs:
-      #- build-frontend
-      #- build-backend
-      #- test-frontend:
-      #    requires: [build-frontend]
-      #- test-backend:
-      #    requires: [build-backend]
-      #- deploy-infrastructure:
-      #    requires: [test-frontend, test-backend]#, scan-frontend, scan-backend]..
-      #- configure-infrastructure:
-      #    requires: [deploy-infrastructure]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend]#, scan-frontend, scan-backend]..
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       #- run-migrations:
       #    requires: [configure-infrastructure]
-      #- deploy-frontend:
-      #    requires: [configure-infrastructure]#[run-migrations]
-      #- deploy-backend:
-      #    requires: [configure-infrastructure]#[run-migrations]
-      #- smoke-test:
-      #    requires: [deploy-backend, deploy-frontend]
-      #- cloudfront-update:
-      #    requires: [smoke-test]
-      - cleanup
-      #    requires: [cloudfront-update]
+      - deploy-frontend:
+          requires: [configure-infrastructure]#[run-migrations]
+      - deploy-backend:
+          requires: [configure-infrastructure]#[run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
 
