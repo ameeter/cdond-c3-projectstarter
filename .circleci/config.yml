@@ -10,7 +10,7 @@ commands:
           name: Delete S3 files
           when: on_fail
           command: |
-            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive --debug
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - run:
           name: Destroy environments
           when: on_fail
@@ -188,7 +188,7 @@ jobs:
           command: |
             # Your code here
             echo "[web]" > ~/inventory.txt
-            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
+            aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query "Reservations[].Instances[].PublicIpAddress" --output text >> ~/inventory.txt
             cat ~/inventory.txt
             #exit 1
       - persist_to_workspace:
@@ -205,7 +205,6 @@ jobs:
       - add_ssh_keys:
             # You can get this ID in the section where you registered the SSH Key
             fingerprints: ["3a:44:ff:ad:19:7e:a4:61:1e:33:09:4e:48:a3:00:6b"] 
-      # attach workspace
       - attach_workspace:
           at: ~/
       - run: cat ~/inventory.txt
@@ -253,12 +252,6 @@ jobs:
       - run:
           name: Install dependancies
           command: |
-            #npm update
-            #sudo apt-get update
-            #sudo apt upgrade -y
-            #sudo apt update
-            #sudo apt install python3 python3-pip python3-setuptools -y
-            #python3 -m pip install awscli
             sudo apt-get update && sudo apt-get install -yy less
             sudo apt-get install unzip -y
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -335,7 +328,6 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["3a:44:ff:ad:19:7e:a4:61:1e:33:09:4e:48:a3:00:6b"] 
-      # attach workspace
       - attach_workspace:
           at: ~/
       - attach_workspace:
@@ -346,11 +338,6 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
-            #sudo apt-get update
-            #sudo apt upgrade -y
-            #sudo apt update
-            #sudo apt install python3 python3-pip python3-setuptools -y
-            #python3 -m pip install ansible awscli
             sudo apt-get update && sudo apt-get upgrade -y
             sudo apt-get install -y python3 python3-pip python3-setuptools
             sudo python3 -m pip install ansible awscli
@@ -424,7 +411,6 @@ jobs:
             else
               exit 1
             fi
-
       # Here's where you will add some code to rollback on failure  
       - revert-migrations
       - destroy-environment
@@ -450,8 +436,7 @@ jobs:
             # Change the initial stack name, as applicable to you
             export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
             echo "OldWorkflowID: ${OldWorkflowID}"
-            curl https://kvdb.io/QomAW1fbH15gWyF4NqdcML/OldWorkflowID -d ${OldWorkflowID}
-           
+            curl https://kvdb.io/QomAW1fbH15gWyF4NqdcML/OldWorkflowID -d ${OldWorkflowID}      
             aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople
             echo "locally fetched OldWorkflowID: ${OldWorkflowID}"
             echo -n "KVDB OldWorkflowID:"
@@ -489,7 +474,7 @@ jobs:
               export bucket_name="udapeople-${OldWorkflowID}"
               aws s3 ls
               if aws s3api head-bucket --bucket "udapeople-${OldWorkflowID}" 2>/dev/null; then
-                aws s3 rb "s3://${bucket_name}" --force
+                aws s3 rb "s3://${bucket_name}" --recursive --force
                 echo "Bucket ${bucket_name} deleted."
                 aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                 echo "Backend-Stack :"" "udapeople-backend-${OldWorkflowID} Deleted"
@@ -499,43 +484,8 @@ jobs:
               echo "Bucket ${bucket_name} does not exist."
               echo "--------------Cannot Cleanup ----------------"
               fi
-
-              #if [[ $(aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep -q "The specified bucket does not exist" && "${OldWorkflowID}" != "") ]]
-              #then
-              #  aws s3 ls
-              #  echo "Bucket not found"
-              #  echo "--------------Cannot Cleanup ----------------"
-              #else
-              #  echo "--------------Begin Cleanup ----------------"
-              #  aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
-              #  aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              #  echo "Backend-Stack :"" "udapeople-backend-${OldWorkflowID} Deleted"
-              #  aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-              #  echo "Frontend-Stack :"" "udapeople-frontend-${OldWorkflowID} Deleted"
-              #  echo "--------------Cleanup Success----------------"
-              #fi
               echo "Old work flow: ${OldWorkflowID}"
               echo "current work flow: ${CIRCLE_WORKFLOW_ID:0:7}"
-              #aws s3api list-buckets --query 'Buckets[].Name' --output text
-              #aws s3api list-buckets --query 'Buckets[].Name' --output text | grep -E '^[a-zA-Z0-9.\-_]{1,255}$' | while read bucket; do aws s3api get-bucket-tagging --bucket "$bucket" --query 'TagSet[?Key==`aws:cloudformation:logical-id` && Value==`WebsiteBucket`]' --output text | grep -q aws:cloudformation:logical-id && echo "$bucket"; done | wc -l
-              #if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" && "${OldWorkflowID}" != "" ]]
-              #then
-              #  echo "=========Begin Cleanup==========="
-              #  echo "Old work flow: ${OldWorkflowID}"
-              #  echo "current work flow: ${CIRCLE_WORKFLOW_ID:0:7}"
-              #  aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
-              #  aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-              #  aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-              #  echo "========Cleanup Success=========="
-              #  exit 0
-              #else
-              #  echo "=========Begin cannot Cleanup=========="
-              #  echo "Old work flow: ${OldWorkflowID}"
-              #  echo "current work flow: ${CIRCLE_WORKFLOW_ID:0:7}"
-              #  aws s3 ls
-              #  echo "=========end Cannot Cleanup=========="
-              #  exit 0
-              #fi
         - revert-migrations
 
 workflows:
