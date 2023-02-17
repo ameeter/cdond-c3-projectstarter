@@ -11,6 +11,7 @@ commands:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 rb s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --force
       - run:
           name: Destroy environments
           when: on_fail
@@ -474,9 +475,8 @@ jobs:
               export bucket_name="udapeople-${OldWorkflowID}"
               aws s3 ls
               if aws s3api head-bucket --bucket "udapeople-${OldWorkflowID}" 2>/dev/null; then
-                #aws s3 rb "s3://${bucket_name}" --recursive --force
                 aws s3 rm "s3://${bucket_name}" --recursive
-
+                aws s3 rb "s3://${bucket_name}" --force
                 echo "Bucket ${bucket_name} deleted."
                 aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                 echo "Backend-Stack :"" "udapeople-backend-${OldWorkflowID} Deleted"
