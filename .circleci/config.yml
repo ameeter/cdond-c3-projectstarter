@@ -483,10 +483,8 @@ jobs:
             command: |
               export OldWorkflowID=$(curl https://kvdb.io/QomAW1fbH15gWyF4NqdcML/OldWorkflowID)
               echo "s3://udapeople-${OldWorkflowID}"
+              export bucket_name="udapeople-${OldWorkflowID}"
               aws s3 ls
-
-              #aws s3 ls s3://udapeople-${OldWorkflowID} 2>&1 | grep "bucket does not exist"
-
               if aws s3api head-bucket --bucket "udapeople-${OldWorkflowID}" 2>/dev/null; then
                 aws s3 rb "s3://${bucket_name}" --force
                 echo "Bucket ${bucket_name} deleted."
@@ -517,7 +515,6 @@ jobs:
               echo "current work flow: ${CIRCLE_WORKFLOW_ID:0:7}"
               #aws s3api list-buckets --query 'Buckets[].Name' --output text
               #aws s3api list-buckets --query 'Buckets[].Name' --output text | grep -E '^[a-zA-Z0-9.\-_]{1,255}$' | while read bucket; do aws s3api get-bucket-tagging --bucket "$bucket" --query 'TagSet[?Key==`aws:cloudformation:logical-id` && Value==`WebsiteBucket`]' --output text | grep -q aws:cloudformation:logical-id && echo "$bucket"; done | wc -l
-
               #if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" && "${OldWorkflowID}" != "" ]]
               #then
               #  echo "=========Begin Cleanup==========="
