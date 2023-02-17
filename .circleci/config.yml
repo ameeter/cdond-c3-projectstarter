@@ -35,7 +35,6 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            #SUCCESS='curl https://kvdb.io/QomAW1fbH15gWyF4NqdcML/migration_${CIRCLE_WORKFLOW_ID:0:7}'
             SUCCESS=$(curl -k https://kvdb.io/QomAW1fbH15gWyF4NqdcML/migration_${CIRCLE_WORKFLOW_ID:0:7})
             echo $SUCCESS
             if(( $SUCCESS==1 )); 
@@ -436,11 +435,15 @@ jobs:
           command: |
             # Change the initial stack name, as applicable to you
             export OldWorkflowID=$(aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text)
-            echo "OldWorkflowID: ${OldWorkflowID}"
+            echo -n "OldWorkflowID before update on kvdb: " 
+            curl -s https://kvdb.io/QomAW1fbH15gWyF4NqdcML/OldWorkflowID
+
+            echo "local OldWorkflowID: ${OldWorkflowID}"
+
             curl https://kvdb.io/QomAW1fbH15gWyF4NqdcML/OldWorkflowID -d ${OldWorkflowID}      
             aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" --tags project=udapeople
-            echo "locally fetched OldWorkflowID: ${OldWorkflowID}"
-            echo -n "KVDB OldWorkflowID:"
+           
+            echo -n "KVDB OldWorkflowID value:"
             curl -s https://kvdb.io/QomAW1fbH15gWyF4NqdcML/OldWorkflowID
 
             echo "Currrent Workflow ID:" ${CIRCLE_WORKFLOW_ID:0:7}
