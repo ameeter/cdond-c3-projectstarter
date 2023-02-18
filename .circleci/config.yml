@@ -235,7 +235,7 @@ jobs:
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             cd ..
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i ~/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i ~/inventory.txt .circleci/ansible/configure-server.yml -vvv
             #exit 1
       # Here's where you will add some code to rollback on failure  
       - destroy-environment
@@ -354,7 +354,7 @@ jobs:
             cd .circleci/ansible
             cat ~/inventory.txt
             #export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i ~/inventory.txt deploy-backend.yml
+            ansible-playbook -i ~/inventory.txt deploy-backend.yml -vvv
       # Here's where you will add some code to rollback on failure 
       - revert-migrations
       - destroy-environment 
