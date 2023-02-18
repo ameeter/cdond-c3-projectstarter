@@ -412,8 +412,8 @@ jobs:
               exit 1
             fi
       # Here's where you will add some code to rollback on failure  
-      #- revert-migrations
-      #- destroy-environment
+      - revert-migrations
+      - destroy-environment
 
   cloudfront-update:
     docker:
@@ -510,12 +510,12 @@ workflows:
           requires: [test-frontend, test-backend]#, scan-frontend, scan-backend]..
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      #- run-migrations:
-      #    requires: [configure-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       - deploy-frontend:
-          requires: [configure-infrastructure]#[run-migrations]
+          requires: [run-migrations]#[configure-infrastructure]#
       - deploy-backend:
-          requires: [configure-infrastructure]#[run-migrations]
+          requires: [run-migrations]#[configure-infrastructure]#
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
