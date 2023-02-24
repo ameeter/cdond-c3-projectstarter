@@ -37,7 +37,7 @@ commands:
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             SUCCESS=$(curl -k https://kvdb.io/QomAW1fbH15gWyF4NqdcML/migration_${CIRCLE_WORKFLOW_ID:0:7})
             echo $SUCCESS
-            if(( $SUCCESS == 1 )); 
+            if [ "$SUCCESS" == "1" ]; 
             then
               cd ~/project/backend
               npm install
@@ -52,8 +52,6 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      #- restore_cache:
-      #    keys: [frontend-build]
       - run:
           name: Build front-end
           command: |
@@ -136,7 +134,6 @@ jobs:
            npm install
            npm install oauth-sign@^0.9.0
            npm audit fix --audit-level=critical --force
-           #npm audit fix --audit-level=critical --force
            npm audit fix --force
            npm audit --audit-level=critical
 
@@ -154,7 +151,6 @@ jobs:
            npm install
            npm install oauth-sign@^0.9.0
            npm audit fix --audit-level=critical --force
-           #npm audit fix --audit-level=critical --force
            npm audit fix --force
            npm audit --audit-level=critical
 
@@ -214,8 +210,6 @@ jobs:
           name: Install dependencies
           command: |
             # Your code here
-            #apk add --update ansible
-            #yum install -y tar gzip
             pip install pip --upgrade
             pip install ansible awscli
            # exit 1
@@ -340,7 +334,6 @@ jobs:
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             cat ~/inventory.txt
-            #export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i ~/inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure 
       - revert-migrations
@@ -361,7 +354,6 @@ jobs:
             apt install -y curl nodejs npm
             pip install pip --upgrade
             pip install awscli
-            #apk add --update curl nodejs npm
       - run:
           name: Get backend url
           command: |
