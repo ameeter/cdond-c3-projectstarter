@@ -386,7 +386,7 @@ jobs:
             echo ${FRONT_URL} 
             if curl -s ${FRONT_URL} | grep "Welcome"
             then
-              exit 1
+              exit 0
             else
               exit 1
             fi
