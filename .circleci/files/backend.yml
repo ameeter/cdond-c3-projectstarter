@@ -54,15 +54,10 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
-    DependsOn: InstanceEIP
+    #DependsOn: InstanceEIP
 
   InstanceEIP:
     Type: AWS::EC2::EIP
     Properties:
+      Domain: vpc
       InstanceId: !Ref EC2Instance
-
-  EipAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      InstanceId: !Ref EC2Instance
-      EIP: !Ref InstanceEIP
