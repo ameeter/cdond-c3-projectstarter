@@ -1,6 +1,5 @@
 Description: >
   UdaPeople backend stack.
-
 Parameters:
   ID:
     Description: Unique identifier.
@@ -42,6 +41,11 @@ Resources:
           ToPort: 443
           CidrIp: 0.0.0.0/0
 
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -55,3 +59,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref InstanceSecurityGroup
+          #SubnetId: subnet-0123456789abcdef # Replace with your subnet ID
+          PrivateIpAddresses:
+            - Primary: true
+              # Associate EIP with the EC2 instance
+              Association:
+                AllocationId: !GetAtt MyEIP.AllocationId
