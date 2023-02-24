@@ -41,11 +41,6 @@ Resources:
           ToPort: 443
           CidrIp: 0.0.0.0/0
 
-  MyEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
@@ -59,14 +54,15 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: true
-          DeviceIndex: 0
-          GroupSet:
-            - !Ref InstanceSecurityGroup
-          SubnetId: subnet-0a0ed328a895c9685 # Replace with your subnet ID
-          PrivateIpAddresses:
-            - Primary: true
-              # Associate EIP with the EC2 instance
-              Association:
-                AllocationId: !GetAtt MyEIP.AllocationId
+    DependsOn: InstanceEIP
+
+  InstanceEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref EC2Instance
+
+  EipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref EC2Instance
+      EIP: !Ref InstanceEIP
