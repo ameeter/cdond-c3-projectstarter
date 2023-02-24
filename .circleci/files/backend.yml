@@ -64,7 +64,7 @@ Resources:
           DeviceIndex: 0
           GroupSet:
             - !Ref InstanceSecurityGroup
-          #SubnetId: subnet-0123456789abcdef # Replace with your subnet ID
+          SubnetId: subnet-0a0ed328a895c9685 # Replace with your subnet ID
           PrivateIpAddresses:
             - Primary: true
               # Associate EIP with the EC2 instance
