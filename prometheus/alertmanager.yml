@@ -1,0 +1,18 @@
+global:
+  resolve_timeout: 1m
+
+route:
+  group_by: [UdaAlert]
+  receiver: email-me
+
+receivers:
+- name: email-me
+  email_configs:
+  - to: "ameeter@gmail.com"
+    from: "ameeter.udacity@gmail.com"
+    smarthost: "smtp.gmail.com:587"
+    auth_username: "ameeter.udacity@gmail.com"
+    auth_identity: "ameeter.udacity@gmail.com"
+    auth_password: "gxobqegehfrzkevg"
+    #smtp_require_tls: true
+    #send_resolved: true
